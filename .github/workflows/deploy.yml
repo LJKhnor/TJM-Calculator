@@ -1,0 +1,37 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:  # permet de lancer manuellement depuis l'interface GitHub
+
+permissions:
+  contents: write   # nécessaire pour pousser sur la branche gh-pages
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout du code
+        uses: actions/checkout@v4
+
+      - name: ⚙️  Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: 📦 Installation des dépendances
+        run: npm ci
+
+      - name: 🔨 Build Vite
+        run: npm run build
+        # Génère le dossier dist/ avec les fichiers statiques
+
+      - name: 🚀 Déploiement sur GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          # Pousse le contenu de dist/ sur la branche gh-pages
